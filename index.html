@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eco-City Simulator | Умный симулятор города с ИИ-помощником</title>
+    <link rel="stylesheet" href="src/assets/css/main.css">
+    <link rel="stylesheet" href="src/assets/css/components.css">
+    <link rel="stylesheet" href="src/assets/css/theme.css">
+    <link rel="stylesheet" href="src/ui/albedo-assistant/albedo.css">
+    <style>
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .loading-details {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .game-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Экран загрузки -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">🏙️ Загрузка Eco-City Simulator...</div>
+        <div class="loading-details" id="loading-details">Инициализация систем</div>
+    </div>
+
+    <!-- Основной контейнер игры -->
+    <div id="game-container" class="game-container">
+        <!-- Шапка игры -->
+        <header class="game-header">
+            <div class="header-content">
+                <h1>🏙️ Eco-City Simulator</h1>
+                <div class="player-info">
+                    <span class="player-level">Уровень: <strong id="player-level">1</strong></span>
+                    <span class="player-resources">💰 <strong id="player-money">1000</strong></span>
+                    <span class="player-population">👥 <strong id="player-population">10</strong></span>
+                </div>
+                <div class="game-controls">
+                    <button id="save-btn" class="btn-modern">💾 Сохранить</button>
+                    <div class="game-time">
+                        <span id="game-time">00:00:00</span>
+                        <span id="game-date">День 1</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Основной контент -->
+        <main class="game-main">
+            <!-- Боковая панель навигации -->
+            <nav class="game-sidebar">
+                <div class="sidebar-section">
+                    <h3>🏘️ Поселение</h3>
+                    <button class="nav-btn active" data-tab="settlement">Управление</button>
+                    <button class="nav-btn" data-tab="community">Сообщество</button>
+                    <button class="nav-btn" data-tab="infrastructure">Инфраструктура</button>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>🏭 Промышленность</h3>
+                    <button class="nav-btn" data-tab="oil-industry">Нефтяная</button>
+                    <button class="nav-btn" data-tab="agriculture">Сельское хозяйство</button>
+                    <button class="nav-btn" data-tab="livestock">Животноводство</button>
+                    <button class="nav-btn" data-tab="transport">Транспорт</button>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>🌲 Природа</h3>
+                    <button class="nav-btn" data-tab="wildlife">Дикая природа</button>
+                    <button class="nav-btn" data-tab="hunting">Охота и рыбалка</button>
+                    <button class="nav-btn" data-tab="ecology">Экология</button>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>🎮 Игрок</h3>
+                    <button class="nav-btn" data-tab="inventory">🎒 Инвентарь</button>
+                    <button class="nav-btn" data-tab="crafting">🛠️ Крафт</button>
+                    <button class="nav-btn" data-tab="skills">🎯 Навыки</button>
+                    <button class="nav-btn" data-tab="research">🔬 Исследования</button>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>👥 Персонал</h3>
+                    <button class="nav-btn" data-tab="workers">👤 Рабочие</button>
+                    <button class="nav-btn" data-tab="recruitment">💼 Биржа труда</button>
+                    <button class="nav-btn" data-tab="equipment-shop">🛠️ Экипировка</button>
+                </div>
+            </nav>
+
+            <!-- Область контента -->
+            <section class="game-content">
+                <div id="tab-content" class="tab-content">
+                    <!-- Контент будет загружаться динамически -->
+                    <div class="welcome-message glass-card">
+                        <h2>Добро пожаловать в Eco-City Simulator! 🎮</h2>
+                        <p>Выберите раздел в меню слева для начала игры.</p>
+                        <div class="demo-stats">
+                            <div class="stat-card glass-card">
+                                <h3>🏘️ Поселение</h3>
+                                <p>Население: <strong>10/100</strong></p>
+                                <p>Здания: <strong>2</strong></p>
+                                <p>Комфорт: <strong>5/10</strong></p>
+                            </div>
+                            <div class="stat-card glass-card">
+                                <h3>🏭 Промышленность</h3>
+                                <p>Нефть: <strong>0/час</strong></p>
+                                <p>Производство: <strong>0%</strong></p>
+                                <p>Загрязнение: <strong>0%</strong></p>
+                            </div>
+                            <div class="stat-card glass-card">
+                                <h3>👥 Персонал</h3>
+                                <p>Рабочие: <strong>3</strong></p>
+                                <p>Зарплата: <strong>155/день</strong></p>
+                                <p>Эффективность: <strong>112%</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Правая панель информации -->
+            <aside class="game-info-panel">
+                <div class="info-section glass-card">
+                    <h3>📊 Быстрая статистика</h3>
+                    <div class="quick-stats">
+                        <div class="stat-item">
+                            <span>💰 Доход:</span>
+                            <span id="quick-income">0/день</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>⚡ Энергия:</span>
+                            <span id="quick-energy">0/100</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>💧 Вода:</span>
+                            <span id="quick-water">0/100</span>
+                        </div>
+                        <div class="stat-item">
+                            <span>😊 Счастье:</span>
+                            <span id="quick-happiness">75%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section glass-card">
+                    <h3>🎯 Активные задачи</h3>
+                    <div class="tasks-list">
+                        <div class="task-item">
+                            <span>🏗️ Построить новый дом</span>
+                            <div class="progress-bar-modern">
+                                <div class="progress-fill-animated" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="task-item">
+                            <span>🌾 Собрать урожай пшеницы</span>
+                            <div class="progress-bar-modern">
+                                <div class="progress-fill-animated" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="task-item">
+                            <span>🛢️ Увеличить добычу нефти</span>
+                            <div class="progress-bar-modern">
+                                <div class="progress-fill-animated" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section glass-card">
+                    <h3>📢 Последние события</h3>
+                    <div class="events-list">
+                        <div class="event-item">
+                            <span class="event-time">Только что</span>
+                            <span>🎮 Игра запущена!</span>
+                        </div>
+                        <div class="event-item">
+                            <span class="event-time">Только что</span>
+                            <span>👥 Наняты стартовые рабочие</span>
+                        </div>
+                        <div class="event-item">
+                            <span class="event-time">Только что</span>
+                            <span>🏗️ Построены стартовые здания</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Система Альбедо -->
+    <div id="albedo-container"></div>
+
+    <!-- Скрипты -->
+    <script type="module" src="src/main.js"></script>
+</body>
+  </html>
