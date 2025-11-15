@@ -1,0 +1,32 @@
+{
+  "name": "eco-city-simulator",
+  "version": "1.0.0",
+  "description": "Умный браузерный симулятор города с ИИ-помощником Альбедо",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "python -m http.server 8000"
+  },
+  "keywords": [
+    "game",
+    "simulator",
+    "city-builder",
+    "economic",
+    "browser-game",
+    "javascript",
+    "ai",
+    "pixel-art"
+  ],
+  "author": "goodnightchellik-ai",
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^4.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/goodnightcl/eco-city-simulator"
+  }
+}
